@@ -1,0 +1,14 @@
+[Unit]
+Description=Homepage Server Service
+After=network.target nginx.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/node ${PATH_TO_SERVER}/index.js
+Restart=on-failure
+User=pi
+Environment=NODE_ENV=production
+Environment=TURNSTILE_SECRET=${TURNSTILE_SECRET}
+
+[Install]
+WantedBy=multi-user.target

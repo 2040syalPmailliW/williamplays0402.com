@@ -26,7 +26,10 @@ import Card from '../components/Card.tsx';
         <!-- Contact Form -->
         <div>
           <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-8">Send me a message</h2>
-          <form class="space-y-6">
+            <form 
+              class="space-y-6" 
+              id="contact-form"
+            >
             <div>
               <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Name</label>
               <input 
@@ -35,20 +38,57 @@ import Card from '../components/Card.tsx';
                 name="name" 
                 required
                 class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                placeholder="Your full name"
+                placeholder="Your Name/Alias"
               />
             </div>
             
             <div>
-              <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email</label>
-              <input 
+              <label for="contact-method" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Preferred Contact Method</label>
+              <select 
+                id="contact-method" 
+                name="contactMethod" 
+                required
+                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                onchange="handleContactMethodChange()"
+              >
+                <option value="" disabled selected>Select how you'd like to be contacted</option>
+                <option value="email">Email</option>
+                <option value="discord">Discord</option>
+                <option value="no-response">Other/No response needed</option>
+              </select>
+            </div>
+            
+            <!-- Dynamic contact fields -->
+            <div id="email-field" class="hidden">
+              <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Your Email</label>
+                <input 
                 type="email" 
                 id="email" 
                 name="email" 
                 required
                 class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                 placeholder="your.email@example.com"
-              />
+                autocomplete="email"
+                title="Please enter a valid email address"
+                />
+            </div>
+
+            <div id="discord-field" class="hidden">
+              <label for="discord-username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Your Discord Username</label>
+                <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 select-none pointer-events-none">@</span>
+                <input 
+                  type="text" 
+                  id="discord-username" 
+                  name="discordUsername" 
+                  class="w-full pl-10 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                  placeholder="username"
+                  minlength="2"
+                  maxlength="32"
+                  title="2-32 lowercase letters, numbers, underscores, or periods. No consecutive periods."
+                  autocomplete="off"
+                />
+                </div>
             </div>
             
             <div>
@@ -74,11 +114,103 @@ import Card from '../components/Card.tsx';
                 placeholder="Tell me about your project or just say hello!"
               ></textarea>
             </div>
-            
-            <Button type="submit" size="lg" className="w-full" disabled={true}>
+
+            <div class="cf-turnstile" data-sitekey="0x4AAAAAABnb58Ri8mrbh4HK" ></div>
+            <div id="form-banner" class="hidden mb-4 rounded-lg px-4 py-3 text-base font-medium transition-all duration-300"></div>
+            <script type="text/javascript">
+              function handleContactMethodChange() {
+                const contactMethod = document.getElementById('contact-method').value;
+                const emailField = document.getElementById('email-field');
+                const discordField = document.getElementById('discord-field');
+                const emailInput = document.getElementById('email');
+                const discordInput = document.getElementById('discord-username');
+
+                // Hide all fields first
+                emailField.classList.add('hidden');
+                discordField.classList.add('hidden');
+
+                // Remove required attribute from all dynamic fields
+                emailInput.removeAttribute('required');
+                discordInput.removeAttribute('required');
+
+                // Show and make required based on selection
+                if (contactMethod === 'email') {
+                  emailField.classList.remove('hidden');
+                  emailInput.setAttribute('required', 'required');
+                } else if (contactMethod === 'discord') {
+                  discordField.classList.remove('hidden');
+                  discordInput.setAttribute('required', 'required');
+                }
+                // For 'no-response', no additional fields are shown
+              }
+
+              function showBanner(message, type) {
+                const banner = document.getElementById('form-banner');
+                banner.textContent = message;
+                banner.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800', 'border', 'border-green-300', 'border-red-300');
+                if (type === 'success') {
+                  banner.classList.add('bg-green-100', 'text-green-800', 'border', 'border-green-300');
+                } else {
+                  banner.classList.add('bg-red-100', 'text-red-800', 'border', 'border-red-300');
+                }
+                // Only hide if the banner message/type hasn't changed
+                const currentMessage = message;
+                const currentType = type;
+                setTimeout(() => {
+                  // If the banner still has the same message and type, hide it
+                  if (
+                    banner.textContent === currentMessage &&
+                    ((currentType === 'success' && banner.classList.contains('bg-green-100')) ||
+                    (currentType !== 'success' && banner.classList.contains('bg-red-100')))
+                  ) {
+                    banner.classList.add('hidden');
+                  }
+                }, 5000);
+              }
+
+              // Patch the form handler to show banners
+              window.handleContactSubmit = async function(e) {
+                e.preventDefault();
+                const form = e.target;
+                const data = {
+                  name: form.name.value,
+                  email: form.email?.value || '',
+                  discordUsername: form.discordUsername?.value || '',
+                  contactMethod: form.contactMethod.value,
+                  subject: form.subject.value,
+                  message: form.message.value,
+                  'cf-turnstile-response': form['cf-turnstile-response']?.value,
+                };
+                try {
+                  const response = await fetch('http://localhost:3005/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                  });
+                  const result = await response.json();
+                  if (response.ok) {
+                    form.reset();
+                    // Hide dynamic fields after reset
+                    document.getElementById('email-field').classList.add('hidden');
+                    document.getElementById('discord-field').classList.add('hidden');
+                    // Remove required attributes after reset
+                    document.getElementById('email').removeAttribute('required');
+                    document.getElementById('discord-username').removeAttribute('required');
+                    showBanner('Your message has been sent successfully!', 'success');
+                  } else {
+                    showBanner(result?.message || 'Something went wrong. Please try again.', 'error');
+                  }
+                } catch (err) {
+                  showBanner('Network error. Please try again later.', 'error');
+                }
+              };
+
+              document.getElementById('contact-form').addEventListener('submit', handleContactSubmit);
+            </script>
+            <Button type="submit" size="lg" className="w-full">
               Send Message
             </Button>
-          </form>
+            </form>
         </div>
 
         <!-- Contact Info -->
