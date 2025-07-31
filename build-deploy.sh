@@ -34,6 +34,18 @@ echo "Setting permissions for the deployment directory..."
 chown -R www-data:www-data /var/www/html/williamplays0402.com
 chmod -R 755 /var/www/html/williamplays0402.com
 
+# ask whether the server has been updated
+read -p "Has the server been updated? (yes/no): " server_updated
+if [[ "$server_updated" != "yes" && "$server_updated" != "no" ]]; then
+  echo "Invalid input. Please enter 'yes' or 'no'."
+  exit 1
+fi
+# If the server has not been updated, exit the script
+if [ "$server_updated" == "no" ]; then
+  echo "Server has not been updated. Exiting."
+  exit 0
+fi
+
 # edit the ./server/homepage-server.service file to point to the new build directory
 echo "Updating service file..."
 sed -i "s|\${PATH_TO_SERVER}|$(cd "$(dirname "$0")/server" && pwd)|g" ./server/homepage-server.service

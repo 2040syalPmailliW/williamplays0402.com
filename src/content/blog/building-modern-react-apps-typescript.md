@@ -6,7 +6,7 @@ date: "2025-07-18"
 category: "Web Development"
 tags: "Astro, Tailwind CSS, Typescript, Web Development"
 readTime: 8
-featured: true
+featured: false
 gradient: "from-blue-500 to-purple-600"
 color: "blue"
 ---
