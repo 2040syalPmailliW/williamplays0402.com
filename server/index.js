@@ -52,7 +52,8 @@ app.post('/', async (req, res) => {
         return res.status(400).send({ success: false, message: 'Message must be less than 1024 characters.' });
       }
       // send a message to a discord webhook
-      const webhookUrl = 'https://discord.com/api/webhooks/1400488206478348318/g045M23iqOYuzAjiKWz4NqB0ZVcLOR8SNNmso6tMA7H1sMFJRJrvrXZQrz8Ck5gRdJFC';
+      // THIS TIME WE ARE GOING TO HIDE IT IN A .env FILE SO THAT BOTS CANNOT SPAM AND ABUSE IT
+      const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
       // style it nicely with an embed
       const embed = {
         title: 'New Contact Form Submission',

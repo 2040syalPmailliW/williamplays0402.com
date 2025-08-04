@@ -57,6 +57,10 @@ cp ./server/homepage-server.service /etc/systemd/system/homepage-server.service
 read -p "Enter the TURNSTILE_SECRET: " TURNSTILE_SECRET
 sed -i "s|\${TURNSTILE_SECRET}|$TURNSTILE_SECRET|g" /etc/systemd/system/homepage-server.service
 
+# prompt the user to enter the DISCORD_WEBHOOK_URL
+read -p "Enter the DISCORD_WEBHOOK_URL: " DISCORD_WEBHOOK_URL
+sed -i "s|\${DISCORD_WEBHOOK_URL}|$DISCORD_WEBHOOK_URL|g" /etc/systemd/system/homepage-server.service
+
 # navigate to the server directory, install dependencies
 cd ./server
 npm install

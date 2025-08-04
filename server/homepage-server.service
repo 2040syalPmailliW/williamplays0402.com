@@ -9,6 +9,7 @@ Restart=on-failure
 User=pi
 Environment=NODE_ENV=production
 Environment=TURNSTILE_SECRET=${TURNSTILE_SECRET}
+Environment=DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
 
 [Install]
 WantedBy=multi-user.target
